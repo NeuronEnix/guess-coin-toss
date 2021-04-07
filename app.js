@@ -5,7 +5,7 @@ const http = require( "http" );
 const socketIO = require( "socket.io" );
 const express = require("express");
 
-const path = require( "path" );
+const path = require( "path" )
 const cookieParser = require('cookie-parser')
 var favicon = require('serve-favicon')
 
