@@ -3,5 +3,22 @@
     <title> GCT - Home </title>
     <body>
         <%- include("partials/navbar.ejs", { activeNav: "Home" } ) %>
+
+        <table class="table" >
+            <thead>
+                <th>#</th>
+                <th>Host</th>
+                <th>Wait Time Out</th>
+                <th>Join</th>
+            </thead>
+            <% for (var i = 0; i < 10; i++) { %>
+                <tr>
+                    <th><%= i+1 %></th>
+                    <td>Some Name <%= i+1 %> </td>
+                    <td>30s</td>
+                    <td><button type="button" class="btn btn-success">Join</button></td>
+                </tr>
+            <% } %>
+        </table>
     </body>
 </html>

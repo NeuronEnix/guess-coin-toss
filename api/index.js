@@ -5,4 +5,6 @@ router.get( "/", isAuthenticated, ( req, res ) => { return res.redirect( "/user/
 
 router.use( "/user", require( "./user" ).UserRouter );
 
+router.use( "/game", require( "./game/router" ) );
+
 module.exports = router;
