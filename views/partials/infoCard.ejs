@@ -1,0 +1,56 @@
+<div class="card" style="width: 100%;">
+
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Profile</h6>
+    </div>
+
+    <img src="<%= imgPath %>" class="card-img-top col-sm-8" alt="">
+
+    <div class="card-body">
+        <h5 class="card-title"> <%- include('./inputField', {
+            labelName: title.label,
+            name: title.name,
+            type: title.type,
+            disabled: title.disabled,
+            value: title.value,
+        } ) %> </h5>
+
+        <div class="card" style="width: 100%;">
+            <ul class="list-group list-group-flush">
+                <% body.forEach( ( val ) => { %>
+                    <li class="list-group-item">
+                        <%- include('./inputField', {
+                            labelName: val.label,
+                            name: val.name,
+                            type: val.type,
+                            disabled: val.disabled,
+                            value: val.value,
+                        } ) %>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+        <div class="row">
+            <% buttons.forEach( ( val ) => { %>
+                <div class="col" style= "width: 50%; padding:0px; margin-left: 1px;">
+                    <% if( val.modal ) { %>
+                        <button type="button" class="btn btn-<%= val.color %>" data-toggle="modal" data-target="#<%= val.modal.modal_id %>"> <%= val.label %></button>                      
+                        <%- include( './modal', val.modal ) %>
+                    <% } else { %>
+                        <form>
+                            <%- include( "./hiddenField", { hiddenFieldList: val.hiddenFieldList } ) %>
+                            <button type="submit" class="float-right btn btn-<%= val.color %>" 
+                                onclick="<%= val.onClick %>"
+                                formaction ="<%= val.formaction %>"
+                                formmethod ="<%= val.formmethod %>">
+                                <%= val.label %>
+                            </button>
+                        </form>
+                    <% } %>
+                </div>
+
+            <% }) %>
+        </div>
+    </div>
+
+</div>
