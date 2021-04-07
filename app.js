@@ -1,10 +1,17 @@
 require( "dotenv" ).config();
 
 // npm modules
-const path = require( "path" );
+const http = require( "http" );
+const socketIO = require( "socket.io" );
 const express = require("express");
+
+const path = require( "path" );
 const cookieParser = require('cookie-parser')
 var favicon = require('serve-favicon')
+
+const app = express();
+const httpServer = http.createServer( app );
+const io = socketIO( httpServer );
 
 // handler
 const {
@@ -15,7 +22,6 @@ const {
 dbHandler.connectToDatabase(); 
 
 // Express setup
-const app = express();
 app.use( favicon( path.join( __dirname, 'public', 'favicon.ico' ) ) );
 app.use(express.static(__dirname + '/public'));
 app.use( cookieParser() );
@@ -48,4 +54,4 @@ app.use( resHandler.uncaughtErrHandler );
 
 // Run the server
 const PORT = process.env.PORT || 8080
-app.listen( PORT, () => console.log( "Server listening at:", PORT ) );
+httpServer.listen( PORT, () => console.log( "Server listening at:", PORT ) );
