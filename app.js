@@ -2,16 +2,16 @@ require( "dotenv" ).config();
 
 // npm modules
 const http = require( "http" );
-const socketIO = require( "socket.io" );
 const express = require("express");
 
-const path = require( "path" )
-const cookieParser = require('cookie-parser')
-var favicon = require('serve-favicon')
+const path = require( "path" );
+const cookieParser = require('cookie-parser');
+var favicon = require('serve-favicon');
 
 const app = express();
 const httpServer = http.createServer( app );
-const io = socketIO( httpServer );
+const io = require( './sok' ).socketIO( httpServer );
+
 
 // handler
 const {
