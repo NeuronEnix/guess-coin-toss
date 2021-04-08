@@ -2,8 +2,8 @@ const router = require( "express" ).Router();
 const { isAuthenticated } = require( "../../handler").sessionHandler;
 // const { resRender } = require( "../../handler" ).resHandler;
 
-const hostGame = require( "./controller/hostGame" );
+const playGame = require( "./controller/playGame" );
 
-router.get( "/host", isAuthenticated, hostGame );
+router.get( "/play", isAuthenticated, playGame );
 
 module.exports = router;

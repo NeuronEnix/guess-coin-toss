@@ -25,7 +25,13 @@ dbHandler.connectToDatabase();
 app.use( favicon( path.join( __dirname, 'public', 'favicon.ico' ) ) );
 app.use(express.static(__dirname + '/public'));
 app.use( cookieParser() );
+
 app.use( sessionHandler.sessionForExpress );
+
+io.use((socket, next) => {
+    sessionHandler.sessionForExpress(socket.request, {}, next);
+});
+
 app.use( express.json() );
 app.use( express.urlencoded({extended:true}) );
 

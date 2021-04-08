@@ -4,7 +4,7 @@ module.exports = async function hostGame( req, res, next ) {
 
     try {
 
-        return resRender( res, "playPage" );
+        return resRender( res, "playGamePage" );
         
     } catch ( err ) {
         return resErr( res, resErrType.unknownErr, { infoToServer:err } );

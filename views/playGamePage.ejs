@@ -10,7 +10,7 @@
         <div class="card" style="width: 50%;">
             <div class="card-body">
                 <h5 class="card-title" style="color: yellow">Host: <%= host %></h5>
-                <h6 class="card-subtitle mb-2 text-success">Waiting Time Out: 10s</h6>
+                <h6 id="countDown" class="card-subtitle mb-2 text-success"></h6>
               
                 <table id="comTable" class="table">
                     <tr> <td style="color: orange;">System: Welcome <%= name %>! </td> </tr>
@@ -82,3 +82,20 @@
     </script>
 
 </html>
+
+<script>
+    socket.emit( "/game/play" );
+
+    socket.on( "/game/data", gameData => {
+        console.log( gameData );
+        const countDownHandler = setInterval( () => {
+            gameData.countDown -= 1000;
+            if ( gameData.countDown < 0 ) gameData.countDown = 0;
+            
+            document.getElementById( "countDown" ).innerHTML = `${gameData.sts} : ${parseInt(gameData.countDown/1000)} s`
+            
+            if ( gameData.countDown === 0 ) clearInterval( countDownHandler );
+        }, 1000 );
+
+    })
+</script>
