@@ -4,15 +4,16 @@ const moment = require("moment");
 //     plr2: "uid",
 //     face: "head/tail",
 //     createdAt: new Date(),
+//     sts: "Waiting/Waiting To Start/Make A Choose"
 // }
 
 const userGameIndex = {};
 const userSocketIndex = {};
 const gameIndex = {};
 
-const waitTime = 20; // in sec
+const waitTime = 30; // in sec
 
-function playGame( socket ) {
+function playGame( socket, io ) {
     socket.on( "/game/play", () => {
         const { uid, name } = socket.request.session;
 
@@ -36,13 +37,19 @@ function playGame( socket ) {
             };
 
             userGameIndex[ uid ] = uid;
+
+            socket.broadcast.emit( "/game/list", {
+                game_id: uid,
+                host: name,
+                countDown: waitTime,
+            } )
         }
 
         const game = gameIndex[ userGameIndex[ uid ] ];
         
         let countDown;
         switch ( game.sts ) {
-            case "Waiting": countDown = moment( game.createdAt + waitTime*1000 ).diff( moment() ); break;
+            case "Waiting": countDown = parseInt( moment( game.createdAt + waitTime*1000 ).diff( moment() ) / 1000 ); break;
         }
 
         const gameData = { 
@@ -58,4 +65,4 @@ function playGame( socket ) {
 
 
 
-module.exports = { playGame, userGameIndex, userSocketIndex, gameIndex, }
+module.exports = { playGame, userGameIndex, userSocketIndex, gameIndex, waitTime }

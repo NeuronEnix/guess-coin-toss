@@ -89,10 +89,10 @@
     socket.on( "/game/data", gameData => {
         console.log( gameData );
         const countDownHandler = setInterval( () => {
-            gameData.countDown -= 1000;
+            gameData.countDown -= 1;
             if ( gameData.countDown < 0 ) gameData.countDown = 0;
             
-            document.getElementById( "countDown" ).innerHTML = `${gameData.sts} : ${parseInt(gameData.countDown/1000)} s`
+            document.getElementById( "countDown" ).innerHTML = `${gameData.sts} : ${gameData.countDown} s`
             
             if ( gameData.countDown === 0 ) clearInterval( countDownHandler );
         }, 1000 );

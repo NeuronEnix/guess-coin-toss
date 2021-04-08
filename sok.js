@@ -29,7 +29,7 @@ module.exports.socketIO = ( httpServer ) => {
         });
         
 
-        playGame( socket );
+        playGame( socket, io );
 
     });
 
