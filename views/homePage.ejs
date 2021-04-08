@@ -32,7 +32,7 @@
                         <th><%= ind + 1  %></th>
                         <td> <%= game.host %> </td>
                         <td id="countDown<%= game.game_id %>"> <%= game.countDown %> s </td>
-                        <td><form method="post" action="/game/join" >
+                        <td><form method="get" action="/game/join" >
                             <input type="text" name="game_id" value="<%= game.game_id %>" hidden>
                             <button type="submit" class="btn btn-success">Join</button>
                         </form></td>
