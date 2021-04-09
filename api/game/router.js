@@ -6,6 +6,6 @@ const playGame = require( "./controller/playGame" );
 const joinGame = require( "./controller/joinGame" );
 
 router.get( "/play", isAuthenticated, playGame );
-router.get( "/join", isAuthenticated, joinGame );
+router.post( "/join", isAuthenticated, joinGame );
 
 module.exports = router;

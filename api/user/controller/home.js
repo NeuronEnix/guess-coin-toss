@@ -5,9 +5,10 @@ const { gameIndex, userSocketIndex, waitTime } = require( "../../game/sok/playGa
 module.exports = async function home( req, res, next ) {    
 
     try {
+        const { uid } = req.session;
         const gameList = [];
         for ( let game of Object.values( gameIndex) ) {
-            if ( game.sts === "Waiting" ) {
+            if ( game.sts === "Waiting" && game.plr1 != uid && game.plr2 != uid ) {
                 gameList.push({
                     game_id: game.plr1,
                     host: userSocketIndex[ game.plr1 ].name,

@@ -22,7 +22,7 @@ module.exports = async function signIn( req, res, next ) {
         req.session.uid = userDoc._id;
         req.session.name = userDoc.name;
 
-        return resRender( res, "homePage" );
+        return res.redirect( "/user/home" );
         
     } catch ( err ) {
         return resErr( res, resErrType.unknownErr, { infoToServer:err } );

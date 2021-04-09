@@ -15,18 +15,19 @@
                 <table id="comTable" class="table">
                     <tr> <td style="color: orange;">System: Welcome <%= name %>! </td> </tr>
                 </table>
-                
-                <div id="choose-row"  class="row" hidden> 
-                    <div class="col"> Choose: </div>
-                    <div class="col">
-                        <input class="form-check-input" type="radio" name="choice" id="headRadio" checked>
-                        <label class="form-check-label" for="headRadio"> Head </label>
-                      </div>
-                      <div class="col">
-                        <input class="form-check-input" type="radio" name="choice" id="tailRadio">
-                        <label class="form-check-label" for="tailRadio"> Tail </label>
-                      </div>
-                </div>
+                <form id="choose-form" method="post" action="/game/choose" >
+                    <div id="choose-row"  class="row" hidden> 
+                        <div class="col"> Choose: </div>
+                        <div class="col">
+                            <input class="form-check-input" type="radio" name="choice" id="headRadio" checked value="head">
+                            <label class="form-check-label" for="headRadio"> Head </label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="radio" name="choice" id="tailRadio" value="tail">
+                            <label class="form-check-label" for="tailRadio"> Tail </label>
+                        </div>
+                    </div>
+                </form>
 
                 <div class="row">
 
@@ -46,9 +47,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col"> <button id="startGameBtn" onclick="startGame();" type="button" class="btn btn-primary">Start Game</button> </div>
-                    <div class="col"> <button id="surrenderBtn" onclick="surrender();" type="button" class="btn btn-warning" hidden >Surrender</button> </div>
-                    <div class="col"> <button id="leaveGameBtn" onclick="leaveGame();" type="button" class="btn btn-danger" hidden >Leave Game</button> </div>
+                    <div class="col"> <button id="leaveGameBtn" onclick="leaveGame();" type="button" class="btn btn-danger" >Leave Game</button> </div>
                 </div>
             </div>
 
@@ -64,20 +63,27 @@
         
         function sendText() {
             const text = textBox.value.trim();
+            console.log( text );
+            
             
             textBox.value = "";
             textBox.focus();
             textBox.scrollIntoView();
             
             if ( text.length === 0 ) return;
-
+            socket.emit( "/user/chat", { msg: text } );
             const newRow = comTable.insertRow( comTable.rows.length );
             newRow.insertCell( 0 ).innerHTML = `<div style="color: blue;float:right;width:100%%;">You: ${ text }</div>`;
         }
+
         function startGame() {
-            document.getElementById("startGameBtn").style.visibility = "hidden";
-            document.getElementById("surrenderBtn").removeAttribute("hidden");
             document.getElementById("choose-row").removeAttribute("hidden");
+        }
+
+        function endGame() {
+            document.getElementById("choose-row").style.visibility = 'hidden';
+
+            // document.getElementById( "choose-form" ).submit();
         }
     </script>
 
@@ -85,17 +91,41 @@
 
 <script>
     socket.emit( "/game/play" );
-
+    const timeHandlers = []
     socket.on( "/game/data", gameData => {
+        timeHandlers.forEach( timeHandler => clearInterval( timeHandler ) );
         console.log( gameData );
+        if ( gameData.sts === "Choose" ) {
+            startGame();
+        }
         const countDownHandler = setInterval( () => {
             gameData.countDown -= 1;
             if ( gameData.countDown < 0 ) gameData.countDown = 0;
             
             document.getElementById( "countDown" ).innerHTML = `${gameData.sts} : ${gameData.countDown} s`
             
-            if ( gameData.countDown === 0 ) clearInterval( countDownHandler );
+            if ( gameData.countDown === 0 ) {
+                clearInterval( countDownHandler );
+                if( gameData.sts === "Choose" ) {
+                    endGame();
+                    console.log( gameData.sts ); 
+                }
+            }
         }, 1000 );
+        timeHandlers.push( countDownHandler );
+    })
+
+    socket.on( "/server/chat" , chatData => {
+        console.log("FromServer:",  chatData )
+        let float="left", color="red";
+        switch ( chatData.type ) {
+            case "you": float = "right"; color = "blue"; break;
+            case "sys": float = "left"; color = "Green"; break;
+            case "other": float = "left"; color = "yellow"; break;
+        }
+
+        const newRow = comTable.insertRow( comTable.rows.length );
+        newRow.insertCell( 0 ).innerHTML = `<div style="color: ${color};float:${float};width:100%%;">${chatData.name}: ${ chatData.msg }</div>`;
 
     })
 </script>

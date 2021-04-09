@@ -1,6 +1,7 @@
 const sok = require('socket.io');
 
 const { playGame, userSocketIndex } = require('./api/game/sok/playGame' );
+const { chatInit } = require('./api/game/sok/chat' );
 
 let activeConnectionCount = 0;
 const a =new Set();
@@ -30,6 +31,7 @@ module.exports.socketIO = ( httpServer ) => {
         
 
         playGame( socket, io );
+        chatInit( socket, io );
 
     });
 
