@@ -43,8 +43,9 @@
         </table>
        
         <script>
+            const gameListTable = document.getElementById( "gameListTable" );
+            const gameListTableBody = document.getElementById( "gameListTableBody" );
             socket.on( "/game/list", ({ host, countDown, game_id }) => {
-                const gameListTableBody = document.getElementById( "gameListTableBody" );
                 gameListTableBody.innerHTML = 
                 `<tr id="${game_id}">
                     <th> 1 </th>
@@ -54,9 +55,12 @@
                         <input type="text" name="game_id" value="${game_id}" hidden>
                         <button type="submit" class="btn btn-success">Join</button>
                     </form></td>
-                </tr>`;
+                </tr>`  + gameListTableBody.innerHTML;
                 setCountDown( game_id, countDown );
+                for( let i=1; i < gameListTable.rows.length; i++ ) {
+                    gameListTable.rows[i].cells[0].innerHTML = i;
+                }
             }) 
         </script>
     </body>
-</html>
+</html> 
