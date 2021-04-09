@@ -9,7 +9,7 @@
         %>
         <div class="card" style="width: 50%;">
             <div class="card-body">
-                <h5 class="card-title" style="color: yellow">Host: <%= host %></h5>
+                <h5 id="hostName" class="card-title" style="color: yellow">Host: Host Name</h5>
                 <h6 id="countDown" class="card-subtitle mb-2 text-success"></h6>
               
                 <table id="comTable" class="table">
@@ -82,7 +82,10 @@
 
         function endGame() {
             document.getElementById("choose-row").style.visibility = 'hidden';
-
+            socket.emit( "/game/choice", {
+                game_id: window.game_id,
+                choice: document.querySelector('input[name="choice"]:checked').value,
+            })
             // document.getElementById( "choose-form" ).submit();
         }
     </script>
@@ -93,6 +96,9 @@
     socket.emit( "/game/play" );
     const timeHandlers = []
     socket.on( "/game/data", gameData => {
+        if( gameData.game_id ) window.game_id  = gameData.game_id;
+        var { game_id, host_name } = gameData;
+        document.getElementById("hostName").innerHTML = "Host: " + host_name;
         timeHandlers.forEach( timeHandler => clearInterval( timeHandler ) );
         console.log( gameData );
         if ( gameData.sts === "Choose" ) {
@@ -108,7 +114,7 @@
                 clearInterval( countDownHandler );
                 if( gameData.sts === "Choose" ) {
                     endGame();
-                    console.log( gameData.sts ); 
+                    console.log( gameData.sts );
                 }
             }
         }, 1000 );
