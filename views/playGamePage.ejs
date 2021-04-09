@@ -13,7 +13,7 @@
                 <h6 id="countDown" class="card-subtitle mb-2 text-success"></h6>
               
                 <table id="comTable" class="table">
-                    <tr> <td style="color: orange;">System: Welcome <%= name %>! </td> </tr>
+                    <tr> <td style="color: orange;">System: Welcome <span id="cur_plr_name"> </span>!</td> </tr>
                 </table>
                 <form id="choose-form" method="post" action="/game/choose" >
                     <div id="choose-row"  class="row" hidden> 
@@ -95,7 +95,13 @@
 <script>
     socket.emit( "/game/play" );
     const timeHandlers = []
+    const curPlayerName = document.getElementById( "cur_plr_name" )
+    curPlayerName.innerHTML = "";
     socket.on( "/game/data", gameData => {
+        
+        // Welcome user
+        if ( curPlayerName.innerHTML == "" ) curPlayerName.innerHTML = gameData.cur_plr_name;
+
         if( gameData.game_id ) window.game_id  = gameData.game_id;
         var { game_id, host_name } = gameData;
         document.getElementById("hostName").innerHTML = "Host: " + host_name;

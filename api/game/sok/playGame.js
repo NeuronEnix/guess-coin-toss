@@ -84,6 +84,7 @@ function playGame( socket, io ) {
             plr1: game.plr1, plr2:game.plr2, 
             game_id: game.plr1,
             host_name: game.plr1_name,
+            cur_plr_name: name,
             countDown,
             sts: game.sts
         };
