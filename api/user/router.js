@@ -9,6 +9,6 @@ router.post( "/sign-up", controller.signUp );
 router.get( "/sign-up", ( req, res ) => { return resRender( res, "user/signUpPage" ); });
 router.get( "/sign-in", ( req, res ) => { return resRender( res, "user/signInPage" ); });
 
-router.get( "/home", isAuthenticated, ( req, res ) => { return resRender( res, "homePage" ); });
+router.get( "/home", isAuthenticated, controller.home );
 
 module.exports = router;

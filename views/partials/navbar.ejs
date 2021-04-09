@@ -17,13 +17,26 @@
       </li>
       
       <li class="nav-item <%= activeNav === 'Play' ? 'active' : '' %>">
-        <a class="nav-link" href="/game/host">Play</a>
+        <a class="nav-link" href="/game/play">Play</a>
       </li>
-                        
-      <!-- <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
-      </li> -->
+      
+      <li class="nav-item active">
+        <span id="activeConnectionCount" class="nav-link" style="color:green"> Online: 0 </span>
+      </li>
 
     </ul>
   </div>
 </nav>
+
+<script type="text/javascript" src="http://localhost:8080/socket.io/socket.io.js"></script>
+<script>
+  const socket = io.connect('http://localhost:8080');
+  const activeConnectionCount = document.getElementById('activeConnectionCount');
+  socket.on('connect', function( online ){
+    console.log('Connected to Server');
+  });
+
+  socket.on('activeConnectionCount', activeConnectionCountFromServer => {
+    activeConnectionCount.innerHTML = "Online: " + activeConnectionCountFromServer;
+  });
+</script>             

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <title> GCT - Play </title>
+    <body>
+        <%- include("partials/navbar.ejs", { activeNav: "Play" } ) %>
+        <% 
+            name = typeof name == "string" ? name : "Some Name";
+            host = typeof host == "string" ? host : "Some Host";
+        %>
+        <div class="card" style="width: 50%;">
+            <div class="card-body">
+                <h5 id="hostName" class="card-title" style="color: yellow">Host: Host Name</h5>
+                <h6 id="countDown" class="card-subtitle mb-2 text-success"></h6>
+              
+                <table id="comTable" class="table">
+                    <tr> <td style="color: orange;">System: Welcome <span id="cur_plr_name"> </span>!</td> </tr>
+                </table>
+                <form id="choose-form" method="post" action="/game/choose" >
+                    <div id="choose-row"  class="row" hidden> 
+                        <div class="col"> Choose: </div>
+                        <div class="col">
+                            <input class="form-check-input" type="radio" name="choice" id="headRadio" checked value="head">
+                            <label class="form-check-label" for="headRadio"> Head </label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="radio" name="choice" id="tailRadio" value="tail">
+                            <label class="form-check-label" for="tailRadio"> Tail </label>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row">
+
+                    <div class="col-md-9">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><%= name %>: </span>
+                            </div>
+                            <input id="textBox" type="text" class="form-control" placeholder="Type Here" aria-label="Message" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3" >
+                        <button type="button" class="btn btn-success" onclick="sendText();">Send</button>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col"> <button id="leaveGameBtn" onclick="leaveGame();" type="button" class="btn btn-danger" >Leave Game</button> </div>
+                </div>
+            </div>
+
+        </div>
+    </body>
+
+    <script>
+
+        const textBox = document.getElementById( "textBox" );
+        const comTable = document.getElementById( "comTable" );
+        
+        textBox.addEventListener( "keyup", ({key}) => { if ( key === "Enter" ) sendText(); })
+        
+        function sendText() {
+            const text = textBox.value.trim();
+            console.log( text );
+            
+            
+            textBox.value = "";
+            textBox.focus();
+            textBox.scrollIntoView();
+            
+            if ( text.length === 0 ) return;
+            socket.emit( "/user/chat", { msg: text } );
+            const newRow = comTable.insertRow( comTable.rows.length );
+            newRow.insertCell( 0 ).innerHTML = `<div style="color: blue;float:right;width:100%%;">You: ${ text }</div>`;
+        }
+
+        function startGame() {
+            document.getElementById("choose-row").removeAttribute("hidden");
+        }
+
+        function endGame() {
+            document.getElementById("choose-row").style.visibility = 'hidden';
+            socket.emit( "/game/choice", {
+                game_id: window.game_id,
+                choice: document.querySelector('input[name="choice"]:checked').value,
+            })
+            // document.getElementById( "choose-form" ).submit();
+        }
+    </script>
+
+</html>
+
+<script>
+    socket.emit( "/game/play" );
+    const timeHandlers = []
+    const curPlayerName = document.getElementById( "cur_plr_name" )
+    curPlayerName.innerHTML = "";
+    socket.on( "/game/data", gameData => {
+        
+        // Welcome user
+        if ( curPlayerName.innerHTML == "" ) curPlayerName.innerHTML = gameData.cur_plr_name;
+
+        if( gameData.game_id ) window.game_id  = gameData.game_id;
+        var { game_id, host_name } = gameData;
+        document.getElementById("hostName").innerHTML = "Host: " + host_name;
+        timeHandlers.forEach( timeHandler => clearInterval( timeHandler ) );
+        console.log( gameData );
+        if ( gameData.sts === "Choose" ) {
+            startGame();
+        }
+        const countDownHandler = setInterval( () => {
+            gameData.countDown -= 1;
+            if ( gameData.countDown < 0 ) gameData.countDown = 0;
+            
+            document.getElementById( "countDown" ).innerHTML = `${gameData.sts} : ${gameData.countDown} s`
+            
+            if ( gameData.countDown === 0 ) {
+                clearInterval( countDownHandler );
+                if( gameData.sts === "Choose" ) {
+                    endGame();
+                    console.log( gameData.sts );
+                }
+            }
+        }, 1000 );
+        timeHandlers.push( countDownHandler );
+    })
+
+    socket.on( "/server/chat" , chatData => {
+        console.log("FromServer:",  chatData )
+        let float="left", color="red";
+        switch ( chatData.type ) {
+            case "you": float = "right"; color = "blue"; break;
+            case "sys": float = "left"; color = "Green"; break;
+            case "other": float = "left"; color = "yellow"; break;
+        }
+
+        const newRow = comTable.insertRow( comTable.rows.length );
+        newRow.insertCell( 0 ).innerHTML = `<div style="color: ${color};float:${float};width:100%%;">${chatData.name}: ${ chatData.msg }</div>`;
+
+    })
+</script>

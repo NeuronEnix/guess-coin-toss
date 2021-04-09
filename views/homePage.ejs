@@ -1,24 +1,66 @@
 <!DOCTYPE html>
+<script>
+    function setCountDown( game_id="", countDown ) {
+        countDown = parseInt( countDown );
+
+        let countDownHandler = setInterval( () => {
+            countDown -= 1;
+            document.getElementById( "countDown"+game_id ).innerHTML = `${countDown} s`;
+            if ( countDown <= 0 ) {
+                countDown = 0;
+                document.getElementById( game_id ).remove();
+                clearInterval( countDownHandler );
+            }
+        }, 1000 );
+    }                    
+</script>
 <html>
     <title> GCT - Home </title>
     <body>
         <%- include("partials/navbar.ejs", { activeNav: "Home" } ) %>
 
-        <table class="table" >
+        <table class="table" id="gameListTable" >
             <thead>
                 <th>#</th>
                 <th>Host</th>
                 <th>Wait Time Out</th>
                 <th>Join</th>
             </thead>
-            <% for ( var i = 0; i < 10; i++ ) { %>
-                <tr>
-                    <th><%= i+1 %></th>
-                    <td>Some Name <%= i+1 %> </td>
-                    <td>30s</td>
-                    <td><button type="button" class="btn btn-success">Join</button></td>
-                </tr>
-            <% } %>
+            <tbody id="gameListTableBody">
+                <% gameList.forEach( ( game, ind ) => { %>
+                    <tr id="<%= game.game_id %>">
+                        <th><%= ind + 1  %></th>
+                        <td> <%= game.host %> </td>
+                        <td id="countDown<%= game.game_id %>"> <%= game.countDown %> s </td>
+                        <td><form method="post" action="/game/join" >
+                            <input type="text" name="game_id" value="<%= game.game_id %>" hidden>
+                            <button type="submit" class="btn btn-success">Join</button>
+                        </form></td>
+                    </tr>
+                    <script> setCountDown( "<%= game.game_id %>", "<%= game.countDown %>")</script>
+                <% }) %>
+            </tbody>
         </table>
+       
+        <script>
+            const gameListTable = document.getElementById( "gameListTable" );
+            const gameListTableBody = document.getElementById( "gameListTableBody" );
+            socket.on( "/game/list", ({ host, countDown, game_id }) => {
+                gameListTableBody.innerHTML = 
+                `<tr id="${game_id}">
+                    <th> 1 </th>
+                    <td> ${host}</td>
+                    <td id="countDown${game_id}"> ${countDown} s </td>
+                    <td><form method="post" action="/game/join" >
+                        <input type="text" name="game_id" value="${game_id}" hidden>
+                        <button type="submit" class="btn btn-success">Join</button>
+                    </form></td>
+                </tr>`  + gameListTableBody.innerHTML;
+                setCountDown( game_id, countDown );
+                for( let i=1; i < gameListTable.rows.length; i++ ) {
+                    gameListTable.rows[i].cells[0].innerHTML = i;
+                }
+            }) 
+        </script>
     </body>
-</html>
+</html> 
